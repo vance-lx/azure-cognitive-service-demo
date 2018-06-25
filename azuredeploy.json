@@ -37,12 +37,14 @@
         },
         "siteName": {
             "type": "string",
+            "defaultValue": "[uniqueString(resourceGroup().id)]",
             "metadata": {
                 "description": "The name of the web app that you wish to create."
             }
         },
         "hostingPlanName": {
             "type": "string",
+            "defaultValue": "[uniqueString(resourceGroup().id)]",
             "metadata": {
                 "description": "The name of the App Service plan to use for hosting the web app."
             }
@@ -129,7 +131,7 @@
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "[parameters('repoURL')]",
@@ -142,7 +144,18 @@
                     "type": "config",
                     "name": "appsettings",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]",
+                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+                    ],
+                    "properties": {
+                        "DEMO_VERSION": "1.0.0"
+                    }
+                },
+                {
+                    "apiVersion": "2015-08-01",
+                    "type": "config",
+                    "name": "appsettings",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]",
                         "[resourceId('Microsoft.CognitiveServices/accounts', parameters('accountName'))]"
                     ],
                     "properties": {
