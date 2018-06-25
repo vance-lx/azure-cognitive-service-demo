@@ -21,5 +21,5 @@ app.use('/node_modules', express.static(path.join(__dirname, '../node_modules'))
 app.use('/api', router);
 
 
+module.exports = app;
 
-app.listen(process.env.PORT || 1337);
