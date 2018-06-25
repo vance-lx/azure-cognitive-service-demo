@@ -31,5 +31,12 @@
     "vuetify": "^1.0.17",
     "vuex": "^2.5.0",
     "weui": "^1.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maye-msft/azure-cognitive-service-demo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maye-msft/azure-cognitive-service-demo/issues"
   }
 }
