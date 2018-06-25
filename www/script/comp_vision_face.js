@@ -148,7 +148,7 @@ function init_vision_face() {
 
                 axios({
                     method: 'POST',
-                    url: '/detectface',
+                    url: '/api/detectface',
                     headers: {
                         "Content-Type": "application/octet-stream"
                     },

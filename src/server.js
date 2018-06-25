@@ -18,7 +18,7 @@ console.log(path.join(__dirname, '../www'));
 app.use('/www', express.static(path.join(__dirname, '../www')))
 app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')))
 
-app.use('/', router);
+app.use('/api', router);
 
 
 
