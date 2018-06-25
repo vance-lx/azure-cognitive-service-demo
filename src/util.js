@@ -5,7 +5,7 @@ const querystring = require("querystring");
 
 const detectface = function(image, cb, err) {
     const subscriptionKey = process.env.coginitive_service_face_key;
-    const area = process.env.coginitive_service_face_area;
+    const endpoint = process.env.coginitive_service_face_endpoint;
     const data = image;
     const params = {
         "returnFaceId": true,
@@ -17,7 +17,7 @@ const detectface = function(image, cb, err) {
 
     
     const paramstr = querystring.stringify(params);
-    const url = `https://${area}.api.cognitive.microsoft.com/face/v1.0/detect?${paramstr}`;
+    const url = `${endpoint}/detect?${paramstr}`;
 
     httprequest('post', url, {
         "Content-Type":"application/octet-stream",

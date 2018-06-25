@@ -139,17 +139,7 @@
                         "IsManualIntegration": true
                     }
                 },
-                {
-                    "apiVersion": "2015-08-01",
-                    "type": "config",
-                    "name": "appsettings",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
-                    ],
-                    "properties": {
-                        "DEMO_VERSION": "1.0.0"
-                    }
-                },
+
                 {
                     "apiVersion": "2015-08-01",
                     "type": "config",
