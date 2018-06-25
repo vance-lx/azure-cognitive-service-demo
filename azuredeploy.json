@@ -9,7 +9,7 @@
             },
             "type": "string"
         },
-        "SKU": {
+        "cognitiveServicesSKU": {
             "type": "string",
             "metadata": {
                 "description": "SKU for Computer Vision API"
@@ -47,7 +47,7 @@
                 "description": "The name of the App Service plan to use for hosting the web app."
             }
         },
-        "sku": {
+        "siteSKU": {
             "type": "string",
             "allowedValues": [
                 "F1",
@@ -105,7 +105,7 @@
             "type": "Microsoft.Web/serverfarms",
             "location": "[resourceGroup().location]",
             "sku": {
-                "name": "[parameters('sku')]",
+                "name": "[parameters('siteSKU')]",
                 "capacity": "[parameters('workerSize')]"
             },
             "properties": {
@@ -155,7 +155,7 @@
         {
             "type": "Microsoft.CognitiveServices/accounts",
             "sku": {
-                "name": "[parameters('SKU')]"
+                "name": "[parameters('cognitiveServicesSKU')]"
             },
             "kind": "ComputerVision",
             "name": "[parameters('accountName')]",
