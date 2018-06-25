@@ -13,8 +13,8 @@ app.use(bodyParser.raw({ type: 'application/octet-stream', limit: '10mb',inflate
 // parse an HTML body into a string
 app.use(bodyParser.text({ type: 'text/html' }))
 
-app.use('/www', express.static(path.join(__dirname, 'www')))
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')))
+app.use('/www', express.static(path.join(__dirname, '../www')))
+app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')))
 
 app.use('/api', router);
 
