@@ -6,6 +6,13 @@ var stringify = require('json-stringify-safe');
 var router = express.Router();
 
 
+router.get('/hello', function (req, res) {
+    
+    
+    res.send("hello")
+
+});
+
 
 router.post('/detectface', function (req, res) {
     
