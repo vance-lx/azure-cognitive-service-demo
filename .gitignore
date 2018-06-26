@@ -65,3 +65,4 @@ testimgs
 
 #others
 package-lock.json
+**/*.*.bk
