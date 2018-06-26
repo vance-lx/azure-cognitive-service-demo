@@ -35,16 +35,16 @@
             ],
             "defaultValue": "southeastasia"
         },
-        "siteName": {
+        "__siteName": {
             "type": "string",
             "defaultValue": "[concat('site', uniqueString(resourceGroup().id))]",
             "metadata": {
                 "description": "The name of the web app that you wish to create."
             }
         },
-        "hostingPlanName": {
+        "__hostingPlanName": {
             "type": "string",
-            "defaultValue": "[concat(parameters('siteName'),'-plan')]",
+            "defaultValue": "[concat(variables('siteName'),'-plan')]",
             "metadata": {
                 "description": "The name of the App Service plan to use for hosting the web app."
             }
@@ -98,12 +98,26 @@
         }
     },
     "variables": {
-        "cognitiveservicesid": "[concat(resourceGroup().id,'/providers/','Microsoft.CognitiveServices/accounts/', parameters('accountName'))]"
+        "cognitiveservicesid": "[concat(resourceGroup().id,'/providers/','Microsoft.CognitiveServices/accounts/', parameters('accountName'))]",
+        "siteName": "[reference('nameParametersTemplate').outputs.siteNameOutput.value]",
+        "hostingPlanName": "[reference('nameParametersTemplate').outputs.hostingPlanOutput.value]"
     },
     "resources": [
         {
+            "apiVersion": "2017-05-10",
+            "name": "nameParametersTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'nameparameters.json')]",
+                    "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+        {
             "apiVersion": "2015-08-01",
-            "name": "[parameters('hostingPlanName')]",
+            "name": "[variables('hostingPlanName')]",
             "type": "Microsoft.Web/serverfarms",
             "location": "[resourceGroup().location]",
             "sku": {
@@ -111,19 +125,19 @@
                 "capacity": "[parameters('workerSize')]"
             },
             "properties": {
-                "name": "[parameters('hostingPlanName')]"
+                "name": "[variables('hostingPlanName')]"
             }
         },
         {
             "apiVersion": "2015-08-01",
-            "name": "[parameters('siteName')]",
+            "name": "[variables('siteName')]",
             "type": "Microsoft.Web/sites",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
             ],
             "properties": {
-                "serverFarmId": "[parameters('hostingPlanName')]"
+                "serverFarmId": "[variables('hostingPlanName')]"
             },
             "resources": [
                 {
@@ -131,7 +145,7 @@
                     "name": "web",
                     "type": "sourcecontrols",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+                        "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
                     ],
                     "properties": {
                         "RepoUrl": "[parameters('repoURL')]",
@@ -145,7 +159,7 @@
                     "type": "config",
                     "name": "appsettings",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+                        "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
                     ],
                     "properties": {
                         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1",
