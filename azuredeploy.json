@@ -110,7 +110,7 @@
             "properties": {
                 "mode": "incremental",
                 "templateLink": {
-                    "uri": "[uri(deployment().properties.templateLink.uri, 'nameparameters.json')]",
+                    "uri": "[uri(deployment().templateLink, 'nameparameters.json')]",
                     "contentVersion": "1.0.0.0"
                 }
             }
