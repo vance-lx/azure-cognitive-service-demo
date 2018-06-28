@@ -2,8 +2,8 @@
 
 var routes = [];
 function initComponent(name) {
-    if(name==="vision-face") {
-        return init_vision_face();
+    if(name==="vision-face-detect") {
+        return init_vision_face_detect();
     } else {
         return null;
     }

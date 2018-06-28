@@ -4,7 +4,8 @@ const store = new Vuex.Store({
       selectedView:null,
       componentNames:[
             {name:"Vision", title: "Vision", icon:"edit",items:[
-                {name:"vision-face",title:"Face API",icon:"pages"}, 
+                {name:"vision-face-detect",title:"Face Detect",icon:"pages"}, 
+                {name:"vision-face-identify",title:"Face Identify",icon:"pages"}, 
             ]},
 
         ],

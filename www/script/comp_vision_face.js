@@ -1,4 +1,4 @@
-function init_vision_face() {
+function init_vision_face_detect() {
     return {
         template: `
         <div style="width:100%;padding:10px">
