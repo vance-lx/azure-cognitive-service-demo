@@ -15,20 +15,3 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
 </a>
 
 
-<hr>
-
-Setup local development environment.
-
-Install Node first
-<code>
-npm install
-</code>
-
-Rename .env.sample into .env
-replace your cognitive service key and endpoint
-
-<code>
-npm run start
-</code>
-
-
