@@ -25,6 +25,7 @@ npm install
 </code>
 
 Rename .env.sample into .env
+
 replace your cognitive service key and endpoint
 
 <code>

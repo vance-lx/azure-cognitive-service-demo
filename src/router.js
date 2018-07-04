@@ -26,6 +26,30 @@ router.post('/detectface', function (req, res) {
 
 });
 
+router.post('/ocr', function (req, res) {
+    
+    
+    util.ocr(req.body,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+
+});
+
+router.post('/recognizeText', function (req, res) {
+    
+    
+    util.recognizeText(req.body,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+
+});
+
 
 
 module.exports = router;

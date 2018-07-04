@@ -4,10 +4,16 @@ var routes = [];
 function initComponent(name) {
     if(name==="vision-face-detect") {
         return init_vision_face_detect();
+    } else if(name==="vision-form-ocr") {
+        return init_vision_form_ocr();
+    } else if(name==="vision-text-ocr") {
+        return init_vision_text_detect();
     } else {
         return null;
     }
 }
+
+
 
 (function(){
     for(let comp of store.state.componentNames) {

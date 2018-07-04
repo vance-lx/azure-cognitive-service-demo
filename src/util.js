@@ -30,6 +30,64 @@ const detectface = function(image, cb, err) {
 }
 
 
+
+recognizeText = function(image, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_vision_key;
+    const endpoint = process.env.coginitive_service_vision_endpoint;
+    const data = image;
+    const params = {
+        "mode": "Handwritten",
+    };
+
+
+    
+    const paramstr = querystring.stringify(params);
+    const url = `${endpoint}/recognizeText?${paramstr}`;
+
+    httprequest('post', url, {
+        "Content-Type":"application/octet-stream",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, data).then(function (response) {
+        let resultUrl = response.headers["operation-location"]
+        setTimeout(() => {
+            httprequest('get', resultUrl, {
+                "Ocp-Apim-Subscription-Key": subscriptionKey
+            }, data).then(function (response) {
+                cb(response.data)
+            }).catch(function(e){
+                err(e)
+            });
+        }, 10000);
+       
+    }).catch(function(e){
+        err(e)
+    });
+}
+
+ocr = function(image, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_vision_key;
+    const endpoint = process.env.coginitive_service_vision_endpoint;
+    const data = image;
+    const params = {
+        "language": "unk",
+        "detectOrientation": true,
+    };
+
+
+    
+    const paramstr = querystring.stringify(params);
+    const url = `${endpoint}/ocr?${paramstr}`;
+
+    httprequest('post', url, {
+        "Content-Type":"application/octet-stream",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function(e){
+        err(e)
+    });
+}
+
 const httprequest = function(method, url, headers, data) {
     return axios({
         method:method,
@@ -41,5 +99,8 @@ const httprequest = function(method, url, headers, data) {
 
 
 module.exports = {
-    detectface:detectface
+    detectface:detectface,
+    recognizeText:recognizeText,
+    ocr:ocr
+
 }

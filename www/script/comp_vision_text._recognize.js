@@ -1,4 +1,4 @@
-function init_vision_face_detect() {
+function init_vision_text_detect() {
     return {
         template: `
         <div style="width:100%">
@@ -7,11 +7,13 @@ function init_vision_face_detect() {
                     <v-flex xs12 sm12 md12 style="margin: 0 auto;">
                         <v-card>
                             <v-toolbar dense  color="cyan">
+
                                 <v-spacer></v-spacer>
-                                <v-btn outline  @click="processImage()" color="white">Capture</v-btn>
+                                <v-btn outline  @click="processOCRImage()" color="white">Capture</v-btn>
                                 
                             </v-toolbar>
-                                <canvas style="padding:10px;width:100%;height:100%; max-width:600px" id="video-canvas"></canvas>
+                                <canvas style="padding:10px;width:100%;height:100%; max-width:600px" id="ocr-video-canvas"></canvas>
+
                                 <v-progress-linear :indeterminate="true" v-if="progressing"></v-progress-linear>
                                 <v-data-table
                                     :headers="headers"
@@ -25,7 +27,7 @@ function init_vision_face_detect() {
                                     </template>
                                 </v-data-table>
 
-                                <video id="video" width="100%" height="100%" autoplay style="padding:10px;display:none" ></video>
+                                <video id="ocr-video" width="100%" height="100%" autoplay style="padding:10px;display:none" ></video>
                                 
                         </v-card>
                     </v-flex>
@@ -38,9 +40,8 @@ function init_vision_face_detect() {
         `,
         data() {
             return {
-                faceRectangles: [],
-                age: [],
-                gender: [],
+                ocrRectangles: [],
+                values: [],
                 headers: [{
                     text: 'Name',
                     align: 'left',
@@ -53,8 +54,7 @@ function init_vision_face_detect() {
                     sortable: false,
                     value: 'value'
                 }],
-                values: [],
-                progressing : false
+                progressing:false
             }
         },
         mounted: function () {
@@ -63,7 +63,7 @@ function init_vision_face_detect() {
         methods: {
             init_camera() {
                 var that = this
-                var video = document.getElementById('video');
+                var video = document.getElementById('ocr-video');
 
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
@@ -88,7 +88,7 @@ function init_vision_face_detect() {
                 }
 
                 video.addEventListener('loadedmetadata', function () {
-                    var videocanvas = document.getElementById('video-canvas');
+                    var videocanvas = document.getElementById('ocr-video-canvas');
                     videocanvas.width = video.videoWidth;
                     videocanvas.height = video.videoHeight;
                 });
@@ -96,7 +96,7 @@ function init_vision_face_detect() {
 
                 video.addEventListener('play', function () {
                     var $this = this; //cache
-                    var videocanvas = document.getElementById('video-canvas');
+                    var videocanvas = document.getElementById('ocr-video-canvas');
                     var videocanvasctx = videocanvas.getContext('2d');
                     (function loop() {
                         if (!$this.paused && !$this.ended) {
@@ -105,16 +105,21 @@ function init_vision_face_detect() {
                             // videocanvasctx.fillText('Hello World!', 150, 100);
                             setTimeout(loop, 1000 / 30); // drawing at 30fps
 
-                            for (var idx in that.faceRectangles) {
-                                var item = that.faceRectangles[idx]
+                            for (var idx in that.ocrRectangles) {
+                                var item = that.ocrRectangles[idx]
+
+                                // videocanvasctx.moveTo(poly[0], poly[1]);
                                 videocanvasctx.beginPath();
-                                videocanvasctx.rect(item.left, item.top, item.width, item.height);
                                 videocanvasctx.lineWidth = 3;
                                 videocanvasctx.strokeStyle = 'yellow';
+                                videocanvasctx.rect(item.left, item.top, item.width, item.height);
+                                // for( var item=2 ; item < poly.length-1 ; item+=2 ){
+                                //     videocanvasctx.lineTo( poly[item] , poly[item+1] )
+                                // }
+
+                                // videocanvasctx.lineTo( poly[1] , poly[1] )
+                                videocanvasctx.closePath();
                                 videocanvasctx.stroke();
-                                videocanvasctx.fillStyle = 'yellow';
-                                videocanvasctx.fillText(that.gender[idx], item.left + item.width + 5, item.top + 20);
-                                videocanvasctx.fillText(that.age[idx], item.left + item.width + 5, item.top + 40);
                             }
 
 
@@ -123,17 +128,24 @@ function init_vision_face_detect() {
                 }, 0);
 
             },
-            
-            processImage() {
+            region2rect(boundingBox) {
+                return {
+                    x: Math.min(boundingBox[0], boundingBox[6]),
+                    y: Math.min(boundingBox[1], boundingBox[3]),
+                    w: Math.max(boundingBox[2], boundingBox[4]) - Math.min(boundingBox[0], boundingBox[6]),
+                    h: Math.max(boundingBox[5], boundingBox[7]) - Math.min(boundingBox[1], boundingBox[3])
+                }
+            },
+            processOCRImage() {
                 var that = this;
-                var videocanvas = document.getElementById('video-canvas');
+                var videocanvas = document.getElementById('ocr-video-canvas');
                 var image = videocanvas.toDataURL();
                 var binaryData = dataURItoBlob(image)
                 var binaryDataToSend = new Uint8Array(binaryData)
-                that.progressing = true
+                this.progressing = true
                 axios({
                     method: 'POST',
-                    url: '/api/detectface',
+                    url: '/api/recognizeText',
                     headers: {
                         "Content-Type": "application/octet-stream"
                     },
@@ -141,21 +153,21 @@ function init_vision_face_detect() {
                 }).then(function (response) {
                     const data = response.data;
                     console.log(JSON.stringify(data, null, 2));
-                    that.faceRectangles = [];
-                    that.gender = [];
-                    that.age = [];
+                    that.ocrRectangles = [];
                     that.values = [];
-                    for (var item of data) {
-                        that.faceRectangles.push(item.faceRectangle)
-                        that.age.push(item.faceAttributes.age)
-                        that.gender.push(item.faceAttributes.gender)
-                        that.values = obj2array(flatten(item), 'name', 'value')
+                    for (var item of data.recognitionResult.lines) {
+                        //that.ocrRectangles.push(item.faceRectangle)
+                        var rect = that.region2rect(item.boundingBox)
+                        that.ocrRectangles.push({left:rect.x, top:rect.y,width:rect.w,height:rect.h})
+                        // that.ocrRectangles.push(item.boundingBox);
+                        that.values.push({name:item.text,value:item.boundingBox});
 
                     }
-                    that.progressing = false
+                    that.progressing  = false
                 }).catch(function (e) {
+                    that.progressing  = false
+                    alert("Server Error!")
                     console.log(e)
-                    that.progressing = false
                 });
             }
         }

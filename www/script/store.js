@@ -5,7 +5,12 @@ const store = new Vuex.Store({
       componentNames:[
             {name:"Vision", title: "Vision", icon:"edit",items:[
                 {name:"vision-face-detect",title:"Face Detect",icon:"pages"}, 
-                {name:"vision-face-identify",title:"Face Identify",icon:"pages"}, 
+                {name:"vision-face-identify",title:"Face Recognize",icon:"pages"}, 
+                {name:"vision-text-ocr",title:"Text Recognize",icon:"pages"}, 
+                {name:"vision-form-ocr",title:"Form Recognize",icon:"pages"}, 
+
+
+                
             ]},
 
         ],
