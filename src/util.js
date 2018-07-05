@@ -3,7 +3,7 @@ const axios = require('axios');
 require('dotenv').config()
 const querystring = require("querystring");
 
-const detectface = function(image, cb, err) {
+const detectface = function (image, cb, err) {
     const subscriptionKey = process.env.coginitive_service_face_key;
     const endpoint = process.env.coginitive_service_face_endpoint;
     const data = image;
@@ -15,23 +15,184 @@ const detectface = function(image, cb, err) {
     };
 
 
-    
+
     const paramstr = querystring.stringify(params);
     const url = `${endpoint}/detect?${paramstr}`;
 
     httprequest('post', url, {
-        "Content-Type":"application/octet-stream",
+        "Content-Type": "application/octet-stream",
         "Ocp-Apim-Subscription-Key": subscriptionKey
     }, data).then(function (response) {
         cb(response.data)
-    }).catch(function(e){
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const createPersonGroup = function (personGroupId, groupName, groupUserData, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const data = {
+        "name": groupName,
+        "userData": groupUserData
+    };
+
+    const url = `${endpoint}/persongroups/${personGroupId}`;
+    httprequest('put', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const deletePersonGroup = function (personGroupId, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const url = `${endpoint}/persongroups/${personGroupId}`;
+
+    console.log(url);
+    httprequest('delete', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, null).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const createPersonInGroupPerson = function (groupId, personName, personData, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const data = {
+        "name": personName,
+        "userData": personData
+    };
+
+    const url = `${endpoint}/persongroups/${groupId}/persons`;
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const deletePersonOfGroupPerson = function (personGroupId, personId, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const url = `${endpoint}/persongroups/${personGroupId}/persons/${personId}`;
+
+    console.log(url);
+    httprequest('delete', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, null).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const addFaceToPersonGroupPerson = function (groupId, personId, image, targetFace, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const data = image;
+    const params = {
+        "userData": "User-specified data about the target face to add for any purpose. The maximum length is 1KB.   ",
+        //"targetFace":"A face rectangle to specify the target face to be added to a person. E.g. "targetFace=10,10,100,100"."
+    };
+
+    const paramstr = querystring.stringify(params);
+    const url = `${endpoint}/persongroups/${groupId}/persons/${personId}/persistedFaces?${paramstr}`;
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/octet-stream",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const deleteFaceOfPersonGroupPerson = function (personGroupId, personId, persistedFaceId, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const url = `${endpoint}/persongroups/${personGroupId}/persons/${personId}/persistedFaces/${persistedFaceId}`;
+
+    console.log(url);
+    httprequest('delete', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, null).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const trainPersonGroup = function (personGroupId, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const url = `${endpoint}/persongroups/${personGroupId}/train `;
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, null).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const getTrainingStutasOfPersonGroup = function (personGroupId, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const url = `${endpoint}/persongroups/${personGroupId}/training`;
+
+    httprequest('get', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, null).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const verifyFace = function (faceId, personGroupId, largePersonGroupId, personId, cb, err) {
+    const subscriptionKey = process.env.coginitive_service_face_key;
+    const endpoint = process.env.coginitive_service_face_endpoint;
+    const data = {
+        "faceId": faceId,
+        "personGroupId": personGroupId,
+        "largePersonGroupId": largePersonGroupId,
+        "personId": personId
+
+    };
+
+    const url = `${endpoint}/verify`;
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": subscriptionKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
         err(e)
     });
 }
 
 
-
-recognizeText = function(image, cb, err) {
+const recognizeText = function(image, cb, err) {
     const subscriptionKey = process.env.coginitive_service_vision_key;
     const endpoint = process.env.coginitive_service_vision_endpoint;
     const data = image;
@@ -64,7 +225,7 @@ recognizeText = function(image, cb, err) {
     });
 }
 
-ocr = function(image, cb, err) {
+const ocr = function(image, cb, err) {
     const subscriptionKey = process.env.coginitive_service_vision_key;
     const endpoint = process.env.coginitive_service_vision_endpoint;
     const data = image;
@@ -89,8 +250,9 @@ ocr = function(image, cb, err) {
 }
 
 const httprequest = function(method, url, headers, data) {
+
     return axios({
-        method:method,
+        method: method,
         url: url,
         headers: headers,
         data: data
@@ -101,6 +263,15 @@ const httprequest = function(method, url, headers, data) {
 module.exports = {
     detectface:detectface,
     recognizeText:recognizeText,
-    ocr:ocr
+    ocr:ocr,
 
+    createPersonGroup: createPersonGroup,
+    deletePersonGroup: deletePersonGroup,
+    createPersonInGroupPerson: createPersonInGroupPerson,
+    deletePersonOfGroupPerson: deletePersonOfGroupPerson,
+    addFaceToPersonGroupPerson: addFaceToPersonGroupPerson,
+    deleteFaceOfPersonGroupPerson:deleteFaceOfPersonGroupPerson,
+    trainPersonGroup: trainPersonGroup,
+    getTrainingStutasOfPersonGroup: getTrainingStutasOfPersonGroup,
+    verifyFace: verifyFace
 }
