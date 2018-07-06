@@ -192,7 +192,7 @@ const verifyFace = function (faceId, personGroupId, largePersonGroupId, personId
 }
 
 
-const recognizeText = function(image, cb, err) {
+const recognizeText = function (image, cb, err) {
     const subscriptionKey = process.env.coginitive_service_vision_key;
     const endpoint = process.env.coginitive_service_vision_endpoint;
     const data = image;
@@ -201,12 +201,12 @@ const recognizeText = function(image, cb, err) {
     };
 
 
-    
+
     const paramstr = querystring.stringify(params);
     const url = `${endpoint}/recognizeText?${paramstr}`;
 
     httprequest('post', url, {
-        "Content-Type":"application/octet-stream",
+        "Content-Type": "application/octet-stream",
         "Ocp-Apim-Subscription-Key": subscriptionKey
     }, data).then(function (response) {
         let resultUrl = response.headers["operation-location"]
@@ -215,17 +215,17 @@ const recognizeText = function(image, cb, err) {
                 "Ocp-Apim-Subscription-Key": subscriptionKey
             }, data).then(function (response) {
                 cb(response.data)
-            }).catch(function(e){
+            }).catch(function (e) {
                 err(e)
             });
         }, 10000);
-       
-    }).catch(function(e){
+
+    }).catch(function (e) {
         err(e)
     });
 }
 
-const ocr = function(image, cb, err) {
+const ocr = function (image, cb, err) {
     const subscriptionKey = process.env.coginitive_service_vision_key;
     const endpoint = process.env.coginitive_service_vision_endpoint;
     const data = image;
@@ -235,21 +235,107 @@ const ocr = function(image, cb, err) {
     };
 
 
-    
+
     const paramstr = querystring.stringify(params);
     const url = `${endpoint}/ocr?${paramstr}`;
 
     httprequest('post', url, {
-        "Content-Type":"application/octet-stream",
+        "Content-Type": "application/octet-stream",
         "Ocp-Apim-Subscription-Key": subscriptionKey
     }, data).then(function (response) {
         cb(response.data)
-    }).catch(function(e){
+    }).catch(function (e) {
         err(e)
     });
 }
 
-const httprequest = function(method, url, headers, data) {
+const textAnalyticsInLanguages = function (documents, cb, err) {
+    const textAnalyticsKey = process.env.coginitive_service_text_analytics_key;
+    const textAnalyticsEndpoint = process.env.coginitive_service_text_analytics_endpoint;
+
+    const data = {
+        "documents": documents
+    };
+    const url = `${textAnalyticsEndpoint}/languages`;
+    console.log(JSON.stringify(data));
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": textAnalyticsKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const textAnalyticsInKeyPhrases = function (documents, cb, err) {
+    const textAnalyticsKey = process.env.coginitive_service_text_analytics_key;
+    const textAnalyticsEndpoint = process.env.coginitive_service_text_analytics_endpoint;
+
+    const data = {
+        "documents": documents
+    };
+    const url = `${textAnalyticsEndpoint}/keyPhrases`;
+    console.log(JSON.stringify(data));
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": textAnalyticsKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const textAnalyticsInSentiment = function (documents, cb, err) {
+    const textAnalyticsKey = process.env.coginitive_service_text_analytics_key;
+    const textAnalyticsEndpoint = process.env.coginitive_service_text_analytics_endpoint;
+
+    const data = {
+        "documents": documents
+    };
+    const url = `${textAnalyticsEndpoint}/sentiment`;
+    console.log(JSON.stringify(data));
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": textAnalyticsKey
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const bingSearchNews = function (strSearch, mkt, cb, err) {
+    const bingSearchKey = process.env.coginitive_service_bing_search_key;
+    const bingSearchEndpoint = process.env.coginitive_service_bing_search_endpoint;
+
+    const params = {
+        "q": strSearch,
+        "count":6,
+        "offset":0,
+        "mkt": mkt,
+        //"safeSearch":"Moderate",
+        //"freshness":"month"
+    };
+
+    const paramstr = querystring.stringify(params);
+    const url = `${bingSearchEndpoint}/news/search?${paramstr}`;
+    console.log(url);
+    httprequest('get', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": bingSearchKey
+    }, null).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const httprequest = function (method, url, headers, data) {
 
     return axios({
         method: method,
@@ -261,17 +347,22 @@ const httprequest = function(method, url, headers, data) {
 
 
 module.exports = {
-    detectface:detectface,
-    recognizeText:recognizeText,
-    ocr:ocr,
+    detectface: detectface,
+    recognizeText: recognizeText,
+    ocr: ocr,
 
     createPersonGroup: createPersonGroup,
     deletePersonGroup: deletePersonGroup,
     createPersonInGroupPerson: createPersonInGroupPerson,
     deletePersonOfGroupPerson: deletePersonOfGroupPerson,
     addFaceToPersonGroupPerson: addFaceToPersonGroupPerson,
-    deleteFaceOfPersonGroupPerson:deleteFaceOfPersonGroupPerson,
+    deleteFaceOfPersonGroupPerson: deleteFaceOfPersonGroupPerson,
     trainPersonGroup: trainPersonGroup,
     getTrainingStutasOfPersonGroup: getTrainingStutasOfPersonGroup,
-    verifyFace: verifyFace
+    verifyFace: verifyFace,
+
+    textAnalyticsInLanguages: textAnalyticsInLanguages,
+    textAnalyticsInKeyPhrases: textAnalyticsInKeyPhrases,
+    textAnalyticsInSentiment: textAnalyticsInSentiment,
+    bingSearchNews: bingSearchNews
 }

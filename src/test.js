@@ -6,9 +6,9 @@ const fs = require('fs');
 function test_detectface() {
     fs.readFile('./testimgs/detectface.jpg', function (err, data) {
         if (err) throw err;
-        util.detectface(data,(response)=>{
+        util.detectface(data, (response) => {
             console.log(response)
-        }, (error)=>{
+        }, (error) => {
             console.error(error)
         })
     })
@@ -136,6 +136,115 @@ function test_deleteFaceOfPersonGroupPerson(personGroupId, personId, persistedFa
         console.error(error);
     })
 }
+
+function test_textAnalyticsInLanguages() {
+    
+    var str = `[
+        {
+          "id": "1",
+          "text": "Hello world"
+        },
+        {
+          "id": "2",
+          "text": "Bonjour tout le monde"
+        },
+        {
+          "id": "3",
+          "text": "La carretera estaba atascada. Había mucho tráfico el día de ayer."
+        },
+        {
+          "id": "4",
+          "text": ":) :( :D"
+        },
+        {
+          "id": "5",
+          "text": "囧"
+        }
+      ]    
+    `;
+    var documents = JSON.parse(str);
+    util.textAnalyticsInLanguages(documents, (response) => {
+        console.log(response)
+        console.log(JSON.stringify(response, null, 2));
+
+    }, (error) => {
+        console.error(error);
+    })
+}
+
+function test_textAnalyticsInKeyPhrases() {
+    var str = `[
+        {
+          "language": "en",
+          "id": "1",
+          "text": "Hello world. This is some input text that I love."
+        },
+        {
+          "language": "fr",
+          "id": "2",
+          "text": "Bonjour tout le monde"
+        },
+        {
+          "language": "es",
+          "id": "3",
+          "text": "La carretera estaba atascada. Había mucho tráfico el día de ayer."
+        }
+      ]
+    `;
+    var documents = JSON.parse(str);
+    util.textAnalyticsInKeyPhrases(documents, (response) => {
+        console.log(response)
+        console.log(JSON.stringify(response, null, 2));
+
+    }, (error) => {
+        console.error(error);
+    })
+}
+
+function test_textAnalyticsInSentiment() {
+    var str = `[
+    {
+      "language": "en",
+      "id": "1",
+      "text": "Bad world. This is some input text that I hate."
+    },
+    {
+      "language": "fr",
+      "id": "2",
+      "text": "Bonjour tout le monde"
+    },
+    {
+      "language": "es",
+      "id": "3",
+      "text": "La carretera estaba atascada. Había mucho tráfico el día de ayer."
+    }
+  ]
+`;
+    var documents = JSON.parse(str);
+    util.textAnalyticsInSentiment(documents, (response) => {
+        console.log(response)
+        console.log(JSON.stringify(response, null, 2));
+
+    }, (error) => {
+        console.error(error);
+    })
+}
+
+function test_bingSearchNews(strSearch, mkt) {
+    util.bingSearchNews(strSearch, mkt, (response) => {
+        console.log(response)
+        console.log(JSON.stringify(response, null, 2));
+
+    }, (error) => {
+        console.error(error);
+    })
+}
+
+//test_textAnalyticsInLanguages();
+//test_textAnalyticsInKeyPhrases();
+//test_textAnalyticsInSentiment();
+test_bingSearchNews("中美贸易战","zh-cn");
+
 //test_createGroup("test_pg_01","Test Person Group","group user data");
 //test_createGroupPerson("test_pg_01","Ronaldo","user data");
 //test_addFacesToPersonGroup("Ronaldo", "test_pg_01", "1b0c44c5-dce1-4845-8ca0-575c085c6cf7", null);
