@@ -230,8 +230,8 @@ function test_textAnalyticsInSentiment() {
     })
 }
 
-function test_bingSearchNews(strSearch, mkt) {
-    util.bingSearchNews(strSearch, mkt, (response) => {
+function test_bingSearchNews(strSearch) {
+    util.bingSearchNews(strSearch, (response) => {
         console.log(response)
         console.log(JSON.stringify(response, null, 2));
 
@@ -243,7 +243,7 @@ function test_bingSearchNews(strSearch, mkt) {
 //test_textAnalyticsInLanguages();
 //test_textAnalyticsInKeyPhrases();
 //test_textAnalyticsInSentiment();
-test_bingSearchNews("中美贸易战","zh-cn");
+test_bingSearchNews("中美贸易战");
 
 //test_createGroup("test_pg_01","Test Person Group","group user data");
 //test_createGroupPerson("test_pg_01","Ronaldo","user data");

@@ -13,6 +13,17 @@ router.get('/hello', function (req, res) {
 
 });
 
+router.get('/bingSearchNews', function (req, res) {
+        
+    util.bingSearchNews(req.query.keyword,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+
+});
+
 
 router.post('/detectface', function (req, res) {
     

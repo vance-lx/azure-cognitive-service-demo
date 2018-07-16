@@ -234,10 +234,9 @@ const ocr = function (image, cb, err) {
         "detectOrientation": true,
     };
 
-
-
     const paramstr = querystring.stringify(params);
     const url = `${endpoint}/ocr?${paramstr}`;
+    console.log(url);
 
     httprequest('post', url, {
         "Content-Type": "application/octet-stream",
@@ -309,15 +308,15 @@ const textAnalyticsInSentiment = function (documents, cb, err) {
     });
 }
 
-const bingSearchNews = function (strSearch, mkt, cb, err) {
+const bingSearchNews = function (strSearch, cb, err) {
     const bingSearchKey = process.env.coginitive_service_bing_search_key;
     const bingSearchEndpoint = process.env.coginitive_service_bing_search_endpoint;
 
     const params = {
         "q": strSearch,
-        "count":6,
+        "count":30,
         "offset":0,
-        "mkt": mkt,
+        "mkt": "zh-cn",
         //"safeSearch":"Moderate",
         //"freshness":"month"
     };

@@ -8,6 +8,7 @@ const store = new Vuex.Store({
                 {name:"vision-face-identify",title:"Face Recognize",icon:"pages"}, 
                 {name:"vision-text-ocr",title:"Text Recognize",icon:"pages"}, 
                 {name:"vision-form-ocr",title:"Form Recognize",icon:"pages"}, 
+                {name:"vision-bing-news",title:"Search News",icon:"pages"}, 
 
 
                 
