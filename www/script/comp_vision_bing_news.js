@@ -122,9 +122,12 @@ function NewsCard(name, description, image, url, datePublished, provider) {
     this.name = name;
     this.description = description;
     if (image == null || image.thumbnail == null)
-        this.image = "https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-    else
-        this.image = image.thumbnail.contentUrl;
+        this.image = "https://www.bing.com/th?id=null";//"https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+    else {
+        var urlStr = image.thumbnail.contentUrl;
+        var m = urlStr.indexOf("&");
+        this.image = urlStr.substring(0, m);
+    }
     this.url = url;
     this.datePublished = datePublished;
     if (provider == null && provider[0].name == null)
