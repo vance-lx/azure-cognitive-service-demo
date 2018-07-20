@@ -76,17 +76,3 @@ function dataURItoBlob(dataURI) {
 
     return ia;
 }
-
-var myConfig = {
-    type: 'wordcloud',
-    options: {
-      text: 'We the people of the United States, in order to form a more perfect union, establish justice, insure domestic tranquility, provide for the common defense, promote the general welfare, and secure the blessings of liberty to ourselves and our posterity, do ordain and establish this Constitution for the United States of America.',
-    }
-  };
-   
-  zingchart.render({ 
-      id: 'myChart', 
-      data: myConfig, 
-      height: 400, 
-      width: '100%' 
-  });

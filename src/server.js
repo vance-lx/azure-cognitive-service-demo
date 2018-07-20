@@ -5,7 +5,7 @@ var path = require('path');
 const app = express();
 var bodyParser = require('body-parser');
 // parse various different custom JSON types as JSON
-app.use(bodyParser.json({ type: 'application/*+json' }))
+app.use(bodyParser.json({ type: 'application/json' }))
 
 // parse some custom thing into a Buffer
 app.use(bodyParser.raw({ type: 'application/octet-stream', limit: '10mb',inflate: true }))

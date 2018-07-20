@@ -241,9 +241,9 @@ function test_bingSearchNews(strSearch) {
 }
 
 //test_textAnalyticsInLanguages();
-//test_textAnalyticsInKeyPhrases();
+test_textAnalyticsInKeyPhrases();
 //test_textAnalyticsInSentiment();
-test_bingSearchNews("中美贸易战");
+//test_bingSearchNews("USA");
 
 //test_createGroup("test_pg_01","Test Person Group","group user data");
 //test_createGroupPerson("test_pg_01","Ronaldo","user data");

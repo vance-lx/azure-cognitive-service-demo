@@ -316,7 +316,7 @@ const bingSearchNews = function (strSearch, cb, err) {
         "q": strSearch,
         "count":30,
         "offset":0,
-        "mkt": "zh-cn",
+        "mkt":"en-us",// "zh-cn",
         //"safeSearch":"Moderate",
         //"freshness":"month"
     };
