@@ -68,5 +68,14 @@ router.post('/textAnalyticsInKeyPhrases', function (req, res) {
     })
 });
 
+router.post('/textAnalyticsInSentiment', function (req, res) {
+    
+    util.textAnalyticsInSentiment(req.body,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+});
 
 module.exports = router;

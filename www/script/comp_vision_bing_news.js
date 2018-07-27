@@ -13,9 +13,22 @@ function init_vision_bing_news_search() {
                        
                     <v-flex xs12 sm6 wrap>
                         <v-progress-linear :indeterminate="true" v-if="progressing"></v-progress-linear>
+                        <v-data-table
+                        :headers="headers"
+                        :items="counts"
+                        hide-actions
+                        class="elevation-1">
+                        <template slot="items" slot-scope="props">
+                          <td class="text-xs-center">{{ props.item.total}}</td>
+                          <td class="text-xs-center">{{ props.item.positive}}</td>
+                          <td class="text-xs-center">{{ props.item.lack}}</td>
+                          <td class="text-xs-center">{{ props.item.negative}}</td>
+                          </template>
+                        </v-data-table>
 
                     <v-flex xs12 sm12 md12>
-                        <v-card id="zingChart"></v-card>
+                        <v-card id="zingChart"></v-card> 
+                        
                         <v-layout wrap>
                             <v-flex v-for="card in cards"
                                 :key="card.name">
@@ -43,25 +56,35 @@ function init_vision_bing_news_search() {
         ,
         data() {
             return {
-                _type: String,
-                show: false,
-                readLink: String,
-                queryContext: Object,
-                totalEstimatedMatches: String,
+                counts: [],
                 sort: [],
                 cards: [],
-                headers: [{
-                    text: 'Name',
-                    align: 'left',
-                    sortable: false,
-                    value: 'name'
-                },
-                {
-                    text: 'Value',
-                    align: 'right',
-                    sortable: false,
-                    value: 'value'
-                }],
+                headers: [
+                    {
+                        text: 'Total',
+                        sortable: false,
+                        align: 'center',
+                        value: 'total'
+                    },
+                    {
+                        text: 'Positive',
+                        sortable: false,
+                        align: 'center',
+                        value: 'positive'
+                    },
+                    {
+                        text: 'Lack',
+                        sortable: false,
+                        align: 'center',
+                        value: 'lack'
+                    },
+                    {
+                        text: 'Negative',
+                        sortable: false,
+                        align: 'center',
+                        value: 'negative'
+                    }
+                ],
                 progressing: false
             }
         },
@@ -85,22 +108,53 @@ function init_vision_bing_news_search() {
                     },
                     data: null
                 }).then(function (response) {
-                    const data = response.data;
+                    const dataNews = response.data;
 
                     //alert(data._type);
-                    that._type = data._type;
-                    that.readLink = data.readLink;
-                    that.queryContext = data.queryContext;
-                    that.sort = data.sort;
+                    // that._type = dataNews._type;
+                    // that.readLink = dataNews.readLink;
+                    // that.queryContext = dataNews.queryContext;
+                    // that.sort = dataNews.sort;
                     that.cards = [];
                     var i = 0;
-                    for (var item of data.value) {
+                    for (var item of dataNews.value) {
                         i++;
                         documentsPostArr.push(new DocumentPost("en", i, item.description))
-                        that.cards.push(new NewsCard(item.name, item.description, item.image, item.url, item.datePublished, item.provider));
+                        that.cards.push(new NewsCard(i, item.name, item.description, item.image, item.url, item.datePublished, item.provider));
                     }
+                    var total = i;
+                    AnalyzingKeyPhrasesOfDocuments(documentsPostArr);
 
-                    AnalyzingDocuments(documentsPostArr);
+                    var countLack = 0;
+                    var countNegative = 0;
+                    var countPositive = 0;
+                    axios({
+                        method: 'POST',
+                        url: '/api/textAnalyticsInSentiment',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        data: documentsPostArr
+                    }).then(function (response) {
+                        const data = response.data;
+                        for (var item of data.documents) {
+                            if (item.score == 0.5)
+                                countLack++;
+                            else if (item.score > 0.5)
+                                countPositive++;
+                            else
+                                countNegative++;
+                        }
+                        console.log("that.counts");
+                        var temp=[];
+                        temp.push(new TableItems(total, countLack, countNegative, countPositive));
+                        that.counts=temp;
+                        console.log(that.counts);
+                    }).catch(function (e) {
+                        console.log(e)
+                    });
+
+                    console.log(that.cards);
                     that.progressing = false
                 }).catch(function (e) {
                     console.log(e)
@@ -108,7 +162,6 @@ function init_vision_bing_news_search() {
                 });
             }
         }
-
     }
 }
 
@@ -118,11 +171,19 @@ function DocumentPost(language, id, text) {
     this.text = text;
 }
 
-function NewsCard(name, description, image, url, datePublished, provider) {
+function TableItems(a, b, c, d) {
+    this.total = a;
+    this.lack = b;
+    this.negative = c;
+    this.positive = d;
+}
+
+function NewsCard(id, name, description, image, url, datePublished, provider) {
+    this.id = id;
     this.name = name;
     this.description = description;
     if (image == null || image.thumbnail == null)
-        this.image = "https://www.bing.com/th?id=null";//"https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+        this.image = "https://www.bing.com/th?id=null";
     else {
         var urlStr = image.thumbnail.contentUrl;
         var m = urlStr.indexOf("&");
@@ -134,7 +195,7 @@ function NewsCard(name, description, image, url, datePublished, provider) {
         this.provider = provider[0].name;
 }
 
-function AnalyzingDocuments(documents) {
+function AnalyzingKeyPhrasesOfDocuments(documents) {
     var desArr = String;
     axios({
         method: 'POST',
@@ -204,6 +265,4 @@ function AnalyzingDocuments(documents) {
     }).catch(function (e) {
         console.log(e)
     });
-
 }
-
