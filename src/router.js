@@ -78,4 +78,42 @@ router.post('/textAnalyticsInSentiment', function (req, res) {
     })
 });
 
+router.post('/recognizeSpeech', function (req, res) {
+        
+    util.recognizeSpeech(req.body,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+});
+
+router.get('/textTranslate',function (req, res) {
+                
+    var str = `[
+        {
+          "text": "${req.query.keyword}"
+        }
+      ]
+    `;
+    var documents = JSON.parse(str);
+    util.textTranslate(documents,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+});
+
+router.get('/textToSpeech', function (req, res) {
+    console.log("text to speech");    
+    util.textToSpeech(req.query.keyword,(response)=>{
+        res.json(response)
+    }, (error)=>{
+        res.send(JSON.parse(stringify(error)))
+        console.log(error)
+    })
+
+});
+
 module.exports = router;

@@ -10,6 +10,8 @@ function initComponent(name) {
         return init_vision_text_detect();
     } else if(name==="vision-bing-news") {
         return init_vision_bing_news_search();
+    } else if(name==="vision-text-translator") {
+        return init_vision_text_translator();
     } else {
         return null;
     }

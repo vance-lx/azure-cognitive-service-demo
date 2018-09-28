@@ -14,8 +14,6 @@ const detectface = function (image, cb, err) {
             "age,gender,smile,facialHair,headPose,glasses,emotion,hair,makeup,accessories,blur,exposure,noise"
     };
 
-
-
     const paramstr = querystring.stringify(params);
     const url = `${endpoint}/detect?${paramstr}`;
 
@@ -200,8 +198,6 @@ const recognizeText = function (image, cb, err) {
         "mode": "Handwritten",
     };
 
-
-
     const paramstr = querystring.stringify(params);
     const url = `${endpoint}/recognizeText?${paramstr}`;
 
@@ -291,7 +287,7 @@ const textAnalyticsInKeyPhrases = function (documents, cb, err) {
 const textAnalyticsInSentiment = function (documents, cb, err) {
     const textAnalyticsKey = process.env.coginitive_service_text_analytics_key;
     const textAnalyticsEndpoint = process.env.coginitive_service_text_analytics_endpoint;
-
+    console.log("textAnalyticsInSentiment");
     const data = {
         "documents": documents
     };
@@ -314,9 +310,9 @@ const bingSearchNews = function (strSearch, cb, err) {
 
     const params = {
         "q": strSearch,
-        "count":30,
-        "offset":0,
-        "mkt":"en-us",// "zh-cn",
+        "count": 10,
+        "offset": 0,
+        "mkt": "en-us",// "zh-cn",
         //"safeSearch":"Moderate",
         //"freshness":"month"
     };
@@ -333,6 +329,161 @@ const bingSearchNews = function (strSearch, cb, err) {
         err(e)
     });
 }
+
+const textTranslate = function (strArr, cb, err) {
+    const key = process.env.coginitive_service_text_translator_key;
+    const endpoint = process.env.coginitive_service_text_translator_endpoint2;
+
+    const data = strArr;
+    const params = {
+        "api-version": "3.0",
+        "to": "en",
+        "to": "zh"
+    };
+
+    const paramstr = querystring.stringify(params);
+    const url = `${endpoint}?${paramstr}`;
+    console.log(url);
+    httprequest('post', url, {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": key
+    }, data).then(function (response) {
+        cb(response.data)
+    }).catch(function (e) {
+        err(e)
+    });
+}
+
+const recognizeSpeech = function (recData, cb, err) {
+    var request = require('request');
+
+    console.log("speech to text is running!");
+    var speechKey = process.env.coginitive_service_speech_key;
+    var tokenpoint = process.env.coginitive_service_speech_token_endpoint;
+    var ttspoint = process.env.coginitive_service_speech_tts_endpoint;
+    var sttpoint = process.env.coginitive_service_speech_stt_endpoint;
+    var data = recData;
+    const params = {
+        "language": "en-US",
+    };
+
+    const paramstr = querystring.stringify(params);
+    const url2 = `${sttpoint}/?${paramstr}`;
+
+    httprequest('post', url2, {
+        'Ocp-Apim-Subscription-Key': speechKey,
+        'Content-Type': "audio/wav; codec=audio/pcm; samplerate=16000",
+        'Accept': "application/json"
+        // 'Transfer-Encoding': "chunked",
+        // 'Expect': "100-continue"
+    }, data).then(function (response) {
+        console.log("stt respose:" + response);
+        if (response.status == 200)
+            cb(response.data);
+        console.log(response.data.DisplayText);
+
+    }).catch(function (e) {
+        err(e);
+    });
+}
+
+const textToSpeech = function (strSpeech, cb, err) {
+    console.log("speech to text -- " + strSpeech);
+    var request = require('request');
+    var xmlbuilder = require('xmlbuilder');
+    var fs = require('fs');
+    var wav = require('wav');
+    var Speaker = require('speak');
+
+    var apiKey = process.env.coginitive_service_speech_key;
+    var ep = "https://westus.tts.speech.microsoft.com/cognitiveservices/v1";
+    var ssml_doc = xmlbuilder.create('speak')
+        .att('version', '1.0')
+        .att('xml:lang', 'en-us')
+        .ele('voice')
+        .att('xml:lang', 'en-us')
+        .att('xml:gender', 'Male')
+        .att('name', 'Microsoft Server Speech Text to Speech Voice (en-US, Guy24KRUS)')
+        .txt(strSpeech)
+        .end();
+    var post_speak_data = ssml_doc.toString();
+    var sttPath = '/sttTemp.wav';
+    var sttPort = 5001;
+
+    try {
+        request.post({
+
+            url: 'https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken',
+            headers: {
+                'Ocp-Apim-Subscription-Key': apiKey,
+                'Content-Type': "application/x-www-form-urlencoded"
+            }
+
+        }, function (err, resp, access_token) {
+            if (err || resp.statusCode != 200) {
+                console.log(err, resp.body);
+            } else {
+                console.log("step 3");
+
+                var server = require('http').createServer(function (req, res) {
+                    res.writeHead(200, { 'Content-Type': 'video/mp4' });
+                    var rs = fs.createReadStream('.' + sttPath);
+
+                    rs.on('data', function (chunk) {
+                        res.write(chunk);
+                    });
+                    //rs.pipe(res);
+                    rs.on('end', function () {
+                        res.end();
+                    });
+                }).listen(sttPort);
+
+                server.on('error', function (err) {
+                    console.log(err);
+                });
+
+                os = require('os');
+
+                console.log(os.hostname());
+
+                request.post({
+                    url: ep,
+                    body: post_speak_data,
+                    headers: {
+                        'content-type': 'application/ssml+xml',
+                        'X-Microsoft-OutputFormat': 'riff-24khz-16bit-mono-pcm',
+                        'Authorization': 'Bearer ' + access_token,
+                        'User-Agent': 'Test TTS APP',
+                    },
+                    encoding: null
+                }, function (err, resp, speak_data) {
+                    console.log("step 4");
+                    if (resp.statusCode == 200) {
+                        fs.writeFileSync('.' + sttPath, speak_data);
+                        var os = require('os');
+                        var interfaces = os.networkInterfaces();
+                        var IPv4 = '127.0.0.1';
+                        for (var key in interfaces) {
+                            var alias = 0;
+                            interfaces[key].forEach(function (details) {
+                                if (details.family == 'IPv4' && key == 'en0') {
+                                    IPv4 = details.address;
+                                }
+                            });
+                        }
+                        var rp = 'http://' + IPv4 + ':' + sttPort + sttPath;
+                        console.log(rp);
+                        cb(rp);
+                    }
+                });
+            }
+        });
+    } catch (e) {
+        console.log(e.message);
+        err(e);
+    }
+}
+
 
 const httprequest = function (method, url, headers, data) {
 
@@ -363,5 +514,8 @@ module.exports = {
     textAnalyticsInLanguages: textAnalyticsInLanguages,
     textAnalyticsInKeyPhrases: textAnalyticsInKeyPhrases,
     textAnalyticsInSentiment: textAnalyticsInSentiment,
-    bingSearchNews: bingSearchNews
+    bingSearchNews: bingSearchNews,
+    textTranslate: textTranslate,
+    recognizeSpeech: recognizeSpeech,
+    textToSpeech: textToSpeech
 }

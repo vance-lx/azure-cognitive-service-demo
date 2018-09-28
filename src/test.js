@@ -1,4 +1,3 @@
-
 const util = require('./util.js');
 
 const fs = require('fs');
@@ -138,7 +137,6 @@ function test_deleteFaceOfPersonGroupPerson(personGroupId, personId, persistedFa
 }
 
 function test_textAnalyticsInLanguages() {
-    
     var str = `[
         {
           "id": "1",
@@ -151,14 +149,6 @@ function test_textAnalyticsInLanguages() {
         {
           "id": "3",
           "text": "La carretera estaba atascada. Había mucho tráfico el día de ayer."
-        },
-        {
-          "id": "4",
-          "text": ":) :( :D"
-        },
-        {
-          "id": "5",
-          "text": "囧"
         }
       ]    
     `;
@@ -240,8 +230,40 @@ function test_bingSearchNews(strSearch) {
     })
 }
 
+function test_textTranslate() {
+    var str = `[
+    {
+      "text": "Bad world. This is some input text that I hate."
+    }
+  ]
+`;
+    var documents = JSON.parse(str);
+    util.textTranslate(documents, (response) => {
+        console.log(response)
+        console.log(JSON.stringify(response, null, 2));
+
+    }, (error) => {
+        console.error(error);
+    })
+}
+
+function test_textToSpeech() {
+    var str = "Bad world. This is some input text that I hate.";
+    
+    util.TextToSpeech(str, (response) => {
+        console.log(response)
+        console.log(JSON.stringify(response, null, 2));
+
+    }, (error) => {
+        console.error(error);
+    })
+}
+
+
+//test_textToSpeech();
+test_textTranslate();
 //test_textAnalyticsInLanguages();
-test_textAnalyticsInKeyPhrases();
+//test_textAnalyticsInKeyPhrases();
 //test_textAnalyticsInSentiment();
 //test_bingSearchNews("USA");
 
